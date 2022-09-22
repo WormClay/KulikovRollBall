@@ -1,6 +1,6 @@
 namespace RollBall.Cons
 {
-        enum BonusType
+        public enum BonusType
         {
             Positive,
             Negative

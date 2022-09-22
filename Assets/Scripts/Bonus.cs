@@ -8,16 +8,18 @@ namespace RollBall
 {
     public abstract class Bonus : MonoBehaviour, IDisposable
     {
-        public int val = 0;
-        private BonusType bonusType;
-        public abstract void Interaction(Transform hero);
+        protected BonusType bonusType;
+        public abstract void Interaction(PlayerBall playerBall);
         public abstract void Dispose();
 
         private void OnTriggerEnter(Collider other)
         {
             if (other.CompareTag("Player"))
             {
-                Interaction(other.transform);
+                if (other.TryGetComponent(out PlayerBall playerBall))
+                {
+                    Interaction(playerBall);
+                }
                 Destroy(gameObject);
             }
         }

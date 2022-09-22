@@ -1,14 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using RollBall.Cons;
-using static UnityEngine.Debug;
 
 namespace RollBall
 {
-    public class BonusPlus : Bonus
+    public class BonusSpeedPlus : Bonus
     {
-        public BonusPlus() 
+
+        public BonusSpeedPlus()
         {
             bonusType = BonusType.Positive;
         }
@@ -20,8 +18,8 @@ namespace RollBall
 
         public override void Interaction(PlayerBall playerBall)
         {
-                Log("BonusPlus");
-                playerBall.TakeBonus();
+            playerBall.SetSpeed(0.7f);
         }
     }
 }
+
