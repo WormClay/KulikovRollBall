@@ -15,7 +15,7 @@ namespace RollBall
         public float mouseSpeed = 25f;
 
 
-        private void Start()
+        protected void Start()
         {
             myRigidbody = GetComponent<Rigidbody>();
         }

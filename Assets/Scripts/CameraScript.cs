@@ -15,7 +15,6 @@ namespace RollBall
         private void Update()
         {
             transform.position = Vector3.Lerp(transform.position, (hero.position - offset), Time.deltaTime * smooth);
-            //transform.LookAt(hero.position);
         }
     }
 }
