@@ -16,9 +16,12 @@ namespace RollBall
             //
         }
 
-        public override void Interaction(PlayerBall playerBall)
+        public override void Interaction(GameObject other)
         {
-            playerBall.SetSpeed(0.7f);
+            if (other.TryGetComponent(out ISpeedBoost speedBoost))
+            {
+                speedBoost.BoostSpeed(0.7f);
+            }
         }
     }
 }

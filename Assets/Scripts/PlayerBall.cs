@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace RollBall
 {
-    public sealed class PlayerBall : Player
+    public sealed class PlayerBall : Player, ISpeedBoost, IHPChanged, IExtraBehavior, IBonusable
     {
         private GameManager gm;
         private bool Invulnerability = false;
@@ -43,9 +43,9 @@ namespace RollBall
             gm.TakeBonus();
         }
 
-        public void SetSpeed(float newSpeed) 
+        public void BoostSpeed(float newSpeed)
         {
-           StartCoroutine(SpeedTime(newSpeed));
+            StartCoroutine(SpeedTime(newSpeed));
         }
 
         IEnumerator SpeedTime(float newSpeed)
@@ -68,5 +68,6 @@ namespace RollBall
             Invulnerability = false;
             gm.SetInvulnerability(Invulnerability);
         }
+
     }
 }

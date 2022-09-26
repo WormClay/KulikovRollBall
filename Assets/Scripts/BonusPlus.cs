@@ -18,10 +18,12 @@ namespace RollBall
             //
         }
 
-        public override void Interaction(PlayerBall playerBall)
+        public override void Interaction(GameObject other)
         {
-                Log("BonusPlus");
-                playerBall.TakeBonus();
+            if (other.TryGetComponent(out IBonusable unit))
+            {
+                unit.TakeBonus();
+            }
         }
     }
 }

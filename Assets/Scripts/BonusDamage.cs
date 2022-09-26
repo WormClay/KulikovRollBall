@@ -17,9 +17,12 @@ namespace RollBall
             //
         }
 
-        public override void Interaction(PlayerBall playerBall)
+        public override void Interaction(GameObject other)
         {
-            playerBall.Damage(35);
+            if (other.TryGetComponent(out IHPChanged unit))
+            {
+                unit.Damage(35);
+            }
         }
     }
 }
