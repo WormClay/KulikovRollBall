@@ -15,7 +15,7 @@ namespace RollBall
 
         public override void Dispose()
         {
-            //
+            // 
         }
 
         public override void Interaction(GameObject other)
