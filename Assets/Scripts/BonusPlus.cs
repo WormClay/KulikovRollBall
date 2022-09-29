@@ -10,20 +10,12 @@ namespace RollBall
     {
         public BonusPlus() 
         {
-            bonusType = BonusType.Positive;
+            bonusType = BonusType.Bonus;
         }
 
         public override void Dispose()
         {
             //
-        }
-
-        public override void Interaction(GameObject other)
-        {
-            if (other.TryGetComponent(out IBonusable unit))
-            {
-                unit.TakeBonus();
-            }
         }
     }
 }

@@ -4,14 +4,14 @@ using System.Collections;
 
 namespace RollBall
 {
-    public sealed class PlayerBall : Player, ISpeedBoost, IHPChanged, IExtraBehavior, IBonusable
+    public sealed class PlayerBall : Player
     {
-        private GameManager gm;
+        private DisplayPlayerState displayState;
         private bool Invulnerability = false;
 
         private void Awake()
         {
-            gm = FindObjectOfType<GameManager>();
+            displayState = new DisplayPlayerState();
         }
 
         private void FixedUpdate()
@@ -22,51 +22,51 @@ namespace RollBall
         private void Start()
         {
             base.Start();
-            gm.DisplayHelth(Helth);
+            displayState.DisplayHelth(Helth);
         }
 
-        public void Damage(int damage)
+        public void Damage(object owner)
         {
-            if (!Invulnerability)
+            if (owner is IBonusDamage bonusDamage)
             {
-                Helth -= damage;
-                gm.DisplayHelth(Helth);
-                if (Helth <= 0)
+                if (!Invulnerability)
                 {
-                    gm.SetDefeat();
+                    Helth -= bonusDamage.Damage;
+                    displayState.DisplayHelth(Helth);
+                    if (Helth <= 0)
+                    {
+                        displayState.DisplayDefeat();
+                    }
                 }
             }
         }
 
-        public void TakeBonus()
+        public void BoostSpeed(object owner)
         {
-            gm.TakeBonus();
+            if (owner is IBonusSpeed bonusSpeed) 
+                StartCoroutine(SpeedTime(bonusSpeed.Speed, bonusSpeed.Time));
         }
 
-        public void BoostSpeed(float newSpeed)
-        {
-            StartCoroutine(SpeedTime(newSpeed));
-        }
-
-        IEnumerator SpeedTime(float newSpeed)
+        IEnumerator SpeedTime(float newSpeed, float time)
         {
             Speed = newSpeed;
-            yield return new WaitForSeconds(10);
+            yield return new WaitForSeconds(time);
             Speed = StartSpeed;
         }
 
-        public void SetInvulnerability()
+        public void SetInvulnerability(object owner)
         {
-            StartCoroutine(InvulnerabilityTime());
+            if (owner is IBonusInvulnerability bonusInvulnerability) 
+                StartCoroutine(InvulnerabilityTime(bonusInvulnerability.Time));
         }
 
-        IEnumerator InvulnerabilityTime()
+        IEnumerator InvulnerabilityTime(float time)
         {
             Invulnerability = true;
-            gm.SetInvulnerability(Invulnerability);
-            yield return new WaitForSeconds(10);
+            displayState.DisplayInvulnerability(Invulnerability);
+            yield return new WaitForSeconds(time);
             Invulnerability = false;
-            gm.SetInvulnerability(Invulnerability);
+            displayState.DisplayInvulnerability(Invulnerability);
         }
 
     }

@@ -48,5 +48,10 @@ namespace RollBall
         {
             myRigidbody.AddForce(MovementVector * Speed, ForceMode.Impulse);
         }
+
+        private void OnDisable()
+        {
+            Dispose();
+        }
     }
 }

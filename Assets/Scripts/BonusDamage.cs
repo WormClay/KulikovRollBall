@@ -5,24 +5,17 @@ using RollBall.Cons;
 
 namespace RollBall
 {
-    public class BonusDamage : Bonus
+    public class BonusDamage : Bonus, IBonusDamage
     {
+        public int Damage { get; } = 35;
         public BonusDamage()
         {
-            bonusType = BonusType.Positive;
+            bonusType = BonusType.Damage;
         }
 
         public override void Dispose()
         {
             //
-        }
-
-        public override void Interaction(GameObject other)
-        {
-            if (other.TryGetComponent(out IHPChanged unit))
-            {
-                unit.Damage(35);
-            }
         }
     }
 }
