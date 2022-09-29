@@ -3,12 +3,13 @@ using RollBall.Cons;
 
 namespace RollBall
 {
-    public class BonusSpeedPlus : Bonus
+    public class BonusSpeedPlus : Bonus, IBonusSpeed
     {
-
+        public float Speed { get; } = 0.7f;
+        public float Time { get; } = 10f;
         public BonusSpeedPlus()
         {
-            bonusType = BonusType.Positive;
+            bonusType = BonusType.Speed;
         }
 
         public override void Dispose()
@@ -16,13 +17,6 @@ namespace RollBall
             //
         }
 
-        public override void Interaction(GameObject other)
-        {
-            if (other.TryGetComponent(out ISpeedBoost speedBoost))
-            {
-                speedBoost.BoostSpeed(0.7f);
-            }
-        }
     }
 }
 

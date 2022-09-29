@@ -8,58 +8,38 @@ namespace RollBall
     public sealed class DisplayBonuses
     {
         private TMPro.TextMeshProUGUI textBonus;
-        private TMPro.TextMeshProUGUI textHelth;
         private GameObject textWin;
-        private GameObject textDefeat;
-        private GameObject textInvulnerability;
-        private int need = 0;
-        private int count = 0;
-        public DisplayBonuses(int needBonuses)
+        public DisplayBonuses()
         {
-            textBonus = GameObject.Find("Score").GetComponent<TMPro.TextMeshProUGUI>();
-            textHelth = GameObject.Find("Helth").GetComponent<TMPro.TextMeshProUGUI>();
-            textWin = GameObject.Find("Win");
-            textDefeat = GameObject.Find("Defeat");
-            textInvulnerability = GameObject.Find("Invulnerability");
-            textWin.SetActive(false);
-            textDefeat.SetActive(false);
-            textInvulnerability.SetActive(false);
-            need = needBonuses;
-            DisplayBonus();
+            try 
+            {
+                textBonus = GameObject.Find("Score").GetComponent<TMPro.TextMeshProUGUI>();
+            }
+            catch
+            {
+                Debug.Log("Вывод очков не исправен");
+            }
+            try 
+            {
+                textWin = GameObject.Find("Win");
+                textWin.SetActive(false);
+            }
+            catch
+            {
+                Debug.Log("Вывод текста выигрыша не исправен");
+            }
         }
 
-        public void SetDefeat() 
+        public void DisplayWin()
         {
-            textDefeat.SetActive(true);
+            textWin?.SetActive(true);
             Time.timeScale = 0;
         }
 
-        public void SetInvulnerability(bool val) 
+        public void DisplayBonus(int count, int need) 
         {
-            textInvulnerability.SetActive(val);
+            if (textBonus != null) textBonus.text = $"Бонусов {count}/{need}";
         }
 
-        public bool CheckAndDisplay()
-        {
-            count++;
-            DisplayBonus();
-            if (count >= need)
-            {
-                textWin.SetActive(true);
-                Time.timeScale = 0;
-                return true;
-            }
-            else return false;
-        }
-
-        private void DisplayBonus() 
-        {
-            textBonus.text = $"Бонусов {count}/{need}";
-        }
-
-        public void DisplayHelth(int helth)
-        {
-            textHelth.text = $"Жизни: {helth}";
-        }
     }
 }
