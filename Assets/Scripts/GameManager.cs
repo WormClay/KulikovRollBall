@@ -4,27 +4,33 @@ using UnityEngine;
 using RollBall.Cons;
 using System;
 using static UnityEngine.Debug;
+using UnityEngine.UI;
 
 namespace RollBall.Manager
 {
     public class GameManager : MonoBehaviour, IDisposable
     {
         [SerializeField] GameObject PrefabBonus;
-        private DisplayBonuses displayBonuses;
         private PlayerBall player;
+        private InputController inputController;
+        private ListExecuteObject executeObject;
         private CameraShake cameraShake;
         private List<Transform> listPoints = new List<Transform>();
         private List<Bonus> allBonus = new List<Bonus>();
         private Color red, blue;
-        private int bonusCount = 0;
-        private int bonusTotal = 0;
 
         private void Awake()
         {
-            displayBonuses = new DisplayBonuses();
+            executeObject = new ListExecuteObject();
             try
             {
-                player = FindObjectOfType<PlayerBall>();
+                player = Instantiate(Resources.Load<PlayerBall>("Player"));
+                Log(player);
+                inputController = new InputController(player);
+                executeObject.Add(inputController);
+                var cs = FindObjectOfType<CameraScript>();
+                cs.SetHero(player.transform);
+                executeObject.Add(cs);
             }
             catch (Exception e)
             {
@@ -39,6 +45,8 @@ namespace RollBall.Manager
             {
                 Debug.Log("Тряска камеры не работает!");
             }
+
+            GameObject.Find("Restart").GetComponent<Button>().onClick.AddListener( ()=> Reload() );
         }
 
         void Start()
@@ -57,14 +65,17 @@ namespace RollBall.Manager
             Reload();
         }
 
-        private void Reload() 
+        public void Reload() 
         {
+            Log("Reload");
+            Time.timeScale = 1;
             foreach (Bonus bonus in FindObjectsOfType<Bonus>()) 
             {
                 Destroy(bonus.gameObject);
             }
+            Dispose();
             allBonus.Clear();
-            bonusTotal = 0;
+            int bonusTotal = 0;
 
             foreach (Transform p in listPoints)
             {
@@ -78,6 +89,7 @@ namespace RollBall.Manager
                         comp = go.GetComponent<Bonus>();
                         allBonus.Add(comp);
                         comp.OnTakeBonus += TakeBonus;
+                        comp.OnTakeBonus += player.PlusBonus;
                         bonusTotal++;
                         break;
                     case 2:
@@ -119,7 +131,7 @@ namespace RollBall.Manager
                 }
                 go.transform.position = p.position;
             }
-            displayBonuses.DisplayBonus(bonusCount, bonusTotal);
+            player.Init(bonusTotal);
         }
 
         private void TakeBonus(object owner)
@@ -131,7 +143,7 @@ namespace RollBall.Manager
 
             if (owner is BonusPlus bonusPlus) 
             {
-                PlusBonus();
+                bonusPlus.OnTakeBonus -= player.PlusBonus;
             }
             else if (owner is BonusSpeedPlus bonusSpeedPlus)
             {
@@ -155,16 +167,6 @@ namespace RollBall.Manager
             Log($" count = {allBonus.Count}");
         }
 
-        private void PlusBonus() 
-        {
-            bonusCount++;
-            displayBonuses.DisplayBonus(bonusCount, bonusTotal);
-            if (bonusCount >= bonusTotal)
-            {
-                displayBonuses.DisplayWin();
-            }
-        }
-
         public void Dispose()
         {
             foreach (Bonus b in allBonus)
@@ -172,6 +174,7 @@ namespace RollBall.Manager
                 if (b is Bonus bonus)
                 {
                     bonus.OnTakeBonus -= TakeBonus;
+                    bonus.OnTakeBonus -= player.PlusBonus;
                 }
 
                 if (b is BonusSpeedPlus bonusSpeedPlus)
@@ -200,5 +203,14 @@ namespace RollBall.Manager
         {
             Dispose();
         }
+
+        void FixedUpdate()
+        {
+            foreach (IExecute e in executeObject.ListObject)
+            {
+                e.Execute();
+            }
+        }
+
     }
 }
