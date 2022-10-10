@@ -25,7 +25,7 @@ namespace RollBall.Manager
             try
             {
                 player = Instantiate(Resources.Load<PlayerBall>("Player"));
-                Log(player);
+                //Log(player);
                 inputController = new InputController(player);
                 executeObject.Add(inputController);
                 var cs = FindObjectOfType<CameraScript>();
@@ -67,7 +67,7 @@ namespace RollBall.Manager
 
         public void Reload() 
         {
-            Log("Reload");
+            //Log("Reload");
             Time.timeScale = 1;
             foreach (Bonus bonus in FindObjectsOfType<Bonus>()) 
             {
@@ -164,7 +164,7 @@ namespace RollBall.Manager
                 if (cameraShake != null) bonusDamage.OnTakeBonus -= cameraShake.DoShake;
             }
             allBonus.Remove(owner as Bonus);
-            Log($" count = {allBonus.Count}");
+            //Log($" count = {allBonus.Count}");
         }
 
         public void Dispose()
