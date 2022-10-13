@@ -18,9 +18,11 @@ namespace RollBall.Manager
         private List<Transform> listPoints = new List<Transform>();
         private List<Bonus> allBonus = new List<Bonus>();
         private Color red, blue;
+        private SaveDataRepository saveDataRepository;
 
         private void Awake()
         {
+            saveDataRepository = new SaveDataRepository();
             executeObject = new ListExecuteObject();
             try
             {
@@ -32,7 +34,7 @@ namespace RollBall.Manager
                 cs.SetHero(player.transform);
                 executeObject.Add(cs);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new Exception("Ошибка! Не найден плеер.");
             }
@@ -41,12 +43,15 @@ namespace RollBall.Manager
                 cameraShake = FindObjectOfType<CameraShake>();
                 if (cameraShake == null) throw new Exception();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Debug.Log("Тряска камеры не работает!");
             }
 
             GameObject.Find("Restart").GetComponent<Button>().onClick.AddListener( ()=> Reload() );
+            GameObject.Find("Save").GetComponent<Button>().onClick.AddListener(() => Save());
+            GameObject.Find("Load").GetComponent<Button>().onClick.AddListener(() => Load());
+
         }
 
         void Start()
@@ -55,7 +60,7 @@ namespace RollBall.Manager
             {
                 transform.GetComponentsInChildren<Transform>(listPoints);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new Exception("Ошибка! Не найдены точки спавна бонусов");
             }
@@ -67,71 +72,27 @@ namespace RollBall.Manager
 
         public void Reload() 
         {
-            //Log("Reload");
-            Time.timeScale = 1;
-            foreach (Bonus bonus in FindObjectsOfType<Bonus>()) 
-            {
-                Destroy(bonus.gameObject);
-            }
-            Dispose();
-            allBonus.Clear();
+            ClearGame();
             int bonusTotal = 0;
 
             foreach (Transform p in listPoints)
             {
                 var go = Instantiate(PrefabBonus);
-                Bonus comp;
-                switch (UnityEngine.Random.Range(1, 6))
-                {
-                    case 1:
-                        go.AddComponent<BonusPlus>();
-                        go.GetComponent<Renderer>().material.color = blue;
-                        comp = go.GetComponent<Bonus>();
-                        allBonus.Add(comp);
-                        comp.OnTakeBonus += TakeBonus;
-                        comp.OnTakeBonus += player.PlusBonus;
-                        bonusTotal++;
-                        break;
-                    case 2:
-                        go.AddComponent<BonusSpeedPlus>();
-                        comp = go.GetComponent<Bonus>();
-                        allBonus.Add(comp);
-                        comp.OnTakeBonus += TakeBonus;
-                        comp.OnTakeBonus += player.BoostSpeed;
-                        go.GetComponent<Renderer>().material.color = blue;
-                        break;
-                    case 3:
-                        go.AddComponent<BonusSpeedMinus>();
-                        comp = go.GetComponent<Bonus>();
-                        allBonus.Add(comp);
-                        comp.OnTakeBonus += TakeBonus;
-                        comp.OnTakeBonus += player.BoostSpeed;
-                        if (cameraShake != null) comp.OnTakeBonus += cameraShake.DoShake;
-                        go.GetComponent<Renderer>().material.color = red;
-                        break;
-                    case 4:
-                        go.AddComponent<BonusDamage>();
-                        comp = go.GetComponent<Bonus>();
-                        allBonus.Add(comp);
-                        comp.OnTakeBonus += TakeBonus;
-                        comp.OnTakeBonus += player.Damage;
-                        if (cameraShake != null) comp.OnTakeBonus += cameraShake.DoShake;
-                        go.GetComponent<Renderer>().material.color = red;
-                        break;
-                    case 5:
-                        go.AddComponent<BonusInvulnerability>();
-                        comp = go.GetComponent<Bonus>();
-                        allBonus.Add(comp);
-                        comp.OnTakeBonus += TakeBonus;
-                        comp.OnTakeBonus += player.SetInvulnerability;
-                        go.GetComponent<Renderer>().material.color = blue;
-                        break;
-                    default:
-                        break;
-                }
+                InitBonus(go, UnityEngine.Random.Range(1, 6), ref bonusTotal);
                 go.transform.position = p.position;
             }
             player.Init(bonusTotal);
+        }
+
+        private void ClearGame() 
+        {
+            Time.timeScale = 1;
+            foreach (Bonus bonus in FindObjectsOfType<Bonus>())
+            {
+                Destroy(bonus.gameObject);
+            }
+            Dispose();
+            allBonus.Clear();
         }
 
         private void TakeBonus(object owner)
@@ -199,6 +160,60 @@ namespace RollBall.Manager
             }
         }
 
+        private void InitBonus(GameObject go, int type, ref int bonusTotal) 
+        {
+            Bonus comp;
+            switch (type)
+            {
+                case 1:
+                    go.AddComponent<BonusPlus>();
+                    go.GetComponent<Renderer>().material.color = blue;
+                    comp = go.GetComponent<Bonus>();
+                    allBonus.Add(comp);
+                    comp.OnTakeBonus += TakeBonus;
+                    comp.OnTakeBonus += player.PlusBonus;
+                    bonusTotal++;
+                    break;
+                case 2:
+                    go.AddComponent<BonusSpeedPlus>();
+                    comp = go.GetComponent<Bonus>();
+                    allBonus.Add(comp);
+                    comp.OnTakeBonus += TakeBonus;
+                    comp.OnTakeBonus += player.BoostSpeed;
+                    go.GetComponent<Renderer>().material.color = blue;
+                    break;
+                case 3:
+                    go.AddComponent<BonusSpeedMinus>();
+                    comp = go.GetComponent<Bonus>();
+                    allBonus.Add(comp);
+                    comp.OnTakeBonus += TakeBonus;
+                    comp.OnTakeBonus += player.BoostSpeed;
+                    if (cameraShake != null) comp.OnTakeBonus += cameraShake.DoShake;
+                    go.GetComponent<Renderer>().material.color = red;
+                    break;
+                case 4:
+                    go.AddComponent<BonusDamage>();
+                    comp = go.GetComponent<Bonus>();
+                    allBonus.Add(comp);
+                    comp.OnTakeBonus += TakeBonus;
+                    comp.OnTakeBonus += player.Damage;
+                    if (cameraShake != null) comp.OnTakeBonus += cameraShake.DoShake;
+                    go.GetComponent<Renderer>().material.color = red;
+                    break;
+                case 5:
+                    go.AddComponent<BonusInvulnerability>();
+                    comp = go.GetComponent<Bonus>();
+                    allBonus.Add(comp);
+                    comp.OnTakeBonus += TakeBonus;
+                    comp.OnTakeBonus += player.SetInvulnerability;
+                    go.GetComponent<Renderer>().material.color = blue;
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
         private void OnDisable()
         {
             Dispose();
@@ -210,6 +225,37 @@ namespace RollBall.Manager
             {
                 e.Execute();
             }
+        }
+
+        private void Save() 
+        {
+            Log("Save");
+            List<BonusSave> listBonus = new List<BonusSave>();
+            foreach (Bonus bonus in FindObjectsOfType<Bonus>())
+            {
+                listBonus.Add(new BonusSave() { bonusType = bonus.bonusType, pos = bonus.transform.position });
+            }
+            saveDataRepository.Save(player, listBonus);
+        }
+
+        private void Load() 
+        {
+            Log("Load");
+            List<BonusSave> listBonus = new List<BonusSave>();
+            saveDataRepository.Load(player, ref listBonus);
+
+            if (listBonus.Count > 0)
+            {
+                int a = 0;
+                ClearGame();
+                foreach (BonusSave b in listBonus)
+                {
+                    var go = Instantiate(PrefabBonus);
+                    InitBonus(go, (int)b.bonusType, ref a);
+                    go.transform.position = b.pos;
+                } 
+            }
+
         }
 
     }

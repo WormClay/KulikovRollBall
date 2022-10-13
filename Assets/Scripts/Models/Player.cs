@@ -11,7 +11,7 @@ namespace RollBall
         [SerializeField] protected float Speed { get; set; }
         protected float StartSpeed { get; private set; } = 0.2f;
         private Rigidbody myRigidbody;
-        [SerializeField] protected int Helth { get; set; }
+        public int Helth { get; protected set; }
         protected int StartHelth { get; set; } = 100;
 
         public virtual void Dispose() 

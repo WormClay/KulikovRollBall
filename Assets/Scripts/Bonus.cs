@@ -10,7 +10,7 @@ namespace RollBall
     public abstract class Bonus : MonoBehaviour, IDisposable
     {
         public event TakeBonus OnTakeBonus;
-        protected BonusType bonusType { get; set; }
+        public BonusType bonusType { get; protected set; }
 
         public void Interaction()
         {

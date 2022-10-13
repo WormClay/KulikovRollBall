@@ -7,23 +7,24 @@ namespace RollBall
     public sealed class PlayerBall : Player
     {
         private DisplayPlayerState displayState;
-        private bool Invulnerability = false;
-        private int bonusCount = 0;
-        private int bonusTotal = 0;
+        public bool Invulnerability { get; private set; } = false;
+        public int BonusCount { get; private set; } = 0;
+        public int BonusTotal { get; private set; } = 0;
         private Vector3 startPos;
 
-        public void Init(int bonusTotal) 
+        public void Init(int bonusTotal, int bonusCount = 0, int helth = 0, bool invulnerability = false, Vector3? pos = null) 
         {
-            bonusCount = 0;
-            this.bonusTotal = bonusTotal;
+            this.BonusCount = bonusCount;
+            this.BonusTotal = bonusTotal;
             displayState.DisplayBonus(bonusCount, bonusTotal);
-            Helth = StartHelth;
+            Helth = (helth > 0) ? helth : StartHelth;
             displayState.DisplayHelth(Helth);
             StopAllCoroutines();
-            Invulnerability = false;
-            transform.position = startPos;
+            this.Invulnerability = invulnerability;
+            transform.position = (pos == null) ?  startPos : (Vector3)pos;
             Speed = StartSpeed;
             displayState.Init();
+            //Debug.Log("Application.dataPath="+Application.dataPath);
         }
 
         private void Awake()
@@ -36,7 +37,7 @@ namespace RollBall
         {
             base.Start();
             displayState.DisplayHelth(Helth);
-            displayState.DisplayBonus(bonusCount, bonusTotal);
+            displayState.DisplayBonus(BonusCount, BonusTotal);
         }
 
         public void Damage(object owner)
@@ -85,9 +86,9 @@ namespace RollBall
 
         public void PlusBonus(object owner)
         {
-            bonusCount++;
-            displayState.DisplayBonus(bonusCount, bonusTotal);
-            if (bonusCount >= bonusTotal)
+            BonusCount++;
+            displayState.DisplayBonus(BonusCount, BonusTotal);
+            if (BonusCount >= BonusTotal)
             {
                 displayState.DisplayWin();
             }

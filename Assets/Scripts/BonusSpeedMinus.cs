@@ -9,7 +9,7 @@ namespace RollBall
         public float Time { get; } = 10f;
         public BonusSpeedMinus()
         {
-            bonusType = BonusType.Speed;
+            bonusType = BonusType.SpeedMinus;
         }
 
         public override void Dispose()
