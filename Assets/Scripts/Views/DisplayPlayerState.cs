@@ -9,6 +9,7 @@ namespace RollBall
     {
         private TMPro.TextMeshProUGUI textHelth;
         private TMPro.TextMeshProUGUI textBonus;
+        private TMPro.TextMeshProUGUI textTry;
         private GameObject textWin;
         private GameObject textDefeat;
         private GameObject textInvulnerability;
@@ -69,6 +70,14 @@ namespace RollBall
             {
                 Debug.Log("Вывод текста выигрыша не исправен");
             }
+            try
+            {
+                textTry = GameObject.Find("Try").GetComponent<TMPro.TextMeshProUGUI>();
+            }
+            catch
+            {
+                Debug.Log("Вывод колисества попыток не исправен");
+            }
 
         }
 
@@ -77,6 +86,7 @@ namespace RollBall
             DisplayInvulnerability(false);
             textDefeat?.SetActive(false);
             textWin?.SetActive(false);
+            DisplayTryCount();
         }
 
         public void DisplayDefeat()
@@ -108,9 +118,15 @@ namespace RollBall
             Time.timeScale = 0;
         }
 
-        public void DisplayBonus(int count, int need)
+        public (int cnt, int nd, bool isOk) DisplayBonus(int count, int need)
         {
             if (textBonus != null) textBonus.text = $"Бонусов {count}/{need}";
+            return (count, need, true);
+        }
+
+        private void DisplayTryCount() 
+        {
+            if (textTry != null) textTry.text = $"Количество побед: {PlayerPrefs.GetInt("Win", 0)} / поражений: {PlayerPrefs.GetInt("Defeat", 0)}";
         }
 
     }

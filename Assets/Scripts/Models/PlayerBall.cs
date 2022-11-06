@@ -51,6 +51,7 @@ namespace RollBall
                     if (Helth <= 0)
                     {
                         displayState.DisplayDefeat();
+                        PlayerPrefs.SetInt("Defeat", PlayerPrefs.GetInt("Defeat", 0) + 1);
                     }
                 }
             }
@@ -87,10 +88,12 @@ namespace RollBall
         public void PlusBonus(object owner)
         {
             BonusCount++;
-            displayState.DisplayBonus(BonusCount, BonusTotal);
+            var myKortej = displayState.DisplayBonus(BonusCount, BonusTotal);
+            Debug.Log($"Реализация получения значения через кортеж {myKortej.cnt} {myKortej.nd} {myKortej.isOk}");
             if (BonusCount >= BonusTotal)
             {
                 displayState.DisplayWin();
+                PlayerPrefs.SetInt("Win", PlayerPrefs.GetInt("Win", 0) + 1);
             }
         }
     }
